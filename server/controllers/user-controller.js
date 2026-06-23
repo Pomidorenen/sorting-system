@@ -4,6 +4,7 @@ const config = require('../modules/config')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
+
 class UserController
 {
     async registration(req, res, next)

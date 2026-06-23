@@ -1,5 +1,6 @@
 const {Sequelize} = require('sequelize')
 const config = require('../modules/config')
+const loggerSql = require('../modules/logger-sql')
 
 module.exports = new Sequelize(
     config.database.name,
@@ -9,6 +10,6 @@ module.exports = new Sequelize(
         dialect: 'postgres',
         host: config.database.host,
         port: config.database.port,
-        logging: false
+        logging: loggerSql.logging
     }
 )

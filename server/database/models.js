@@ -1,5 +1,7 @@
 const sequelize = require('./database');
+const logger = require("../modules/logger");
 const { DataTypes } = require('sequelize');
+const { th } = require('@faker-js/faker');
 
 const Address = sequelize.define('address', {
     address_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -11,7 +13,8 @@ const Address = sequelize.define('address', {
     postal_code: { type: DataTypes.STRING(20), allowNull: false }
 }, {
     tableName: 'Address',
-    timestamps: false
+    timestamps: false,
+ 
 });
 
 const Warehouse = sequelize.define('warehouse', {
@@ -39,7 +42,7 @@ const Employee = sequelize.define('employee', {
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: false,
-    indexes: [{ name: 'idx_employee_login', fields: ['login'] }]
+    indexes: [{ name: 'idx_employee_login', fields: ['login'] }],
 });
 
 const Customer = sequelize.define('customer', {
@@ -129,6 +132,21 @@ const OrderItemPart = sequelize.define('orderItemPart', {
     indexes: [{ name: 'idx_order_item_part', fields: ['order_item_id', 'part_id'] }]
 });
 
+// New table for sql-query storage
+const Logging = sequelize.define("Logging", {
+    logging_id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    model_name: { type: DataTypes.STRING(100), allowNull: false },
+    action: {type:DataTypes.ENUM('CREATE', 'UPDATE', 'DELETE')},
+    old_data: DataTypes.JSON,
+    new_data: DataTypes.JSON,
+    // user_id:{ type: DataTypes.INTEGER },
+}, {
+    tableName: 'Logging',
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: false,
+});
+
 Address.hasMany(Warehouse, { foreignKey: 'address_id', onDelete: 'RESTRICT' });
 Warehouse.belongsTo(Address, { foreignKey: 'address_id' });
 
@@ -159,6 +177,8 @@ OrderItemPart.belongsTo(Part, { foreignKey: 'part_id' });
 OrderItem.belongsTo(PartType, { foreignKey: 'part_type_id', onDelete: 'NO ACTION' });
 PartType.hasMany(OrderItem, { foreignKey: 'part_type_id' });
 
+
+
 module.exports = {
     Address,
     Warehouse,
@@ -168,5 +188,6 @@ module.exports = {
     OrderItem,
     PartType,
     Part,
-    OrderItemPart
+    OrderItemPart,
+    Logging
 };
