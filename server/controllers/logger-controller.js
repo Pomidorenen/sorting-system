@@ -72,7 +72,7 @@ class LoggerController {
                 return next(ApiError.badRequest("Incorrect request data"))
             }
 
-            const logs = await Logger.findAndCountAll({
+            const logs = await Logging.findAndCountAll({
                 limit,
                 offset,
                 attributes:[
@@ -109,8 +109,7 @@ class LoggerController {
                 return next(ApiError.badRequest("Incorrect request data"));
             }
             logger.info("Find log");
-            const log = await Logging.findOne({where: {logging_id: id}})
-
+            const log = await Logging.findOne({where: {logging_id: id}});
             if (log)
             {
                 logger.done("Sending response")
@@ -200,7 +199,7 @@ class LoggerController {
                             {...lastLog.old_data},
                             {where:{[primaryKeyName]:lastLog.new_data[primaryKeyName]}},
                             {hooks:false});
-                         break;
+                        break;
                     }
                     case "DELETE":{
                         await model.create({...lastLog.old_data},{ hooks: false });
