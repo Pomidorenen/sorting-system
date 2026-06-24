@@ -133,7 +133,7 @@ const OrderItemPart = sequelize.define('orderItemPart', {
 });
 
 // New table for sql-query storage
-const Logging = sequelize.define("Logging", {
+const Logging = sequelize.define("logging", {
     logging_id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     model_name: { type: DataTypes.STRING(100), allowNull: false },
     action: {type:DataTypes.ENUM('CREATE', 'UPDATE', 'DELETE')},
