@@ -170,7 +170,7 @@ const LoggingScans = sequelize.define("logging_scans",{
         onUpdate: 'CASCADE'
     },
 },{
-    tableName: 'LoggingScans',
+    tableName: 'Logging_Scans',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: false,

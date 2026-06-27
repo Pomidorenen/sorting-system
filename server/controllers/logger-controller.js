@@ -42,6 +42,7 @@ class LoggerController {
                     attributes: ['logging_id']
                 });
 
+                
                 if (oldestLogs.length > 0) {
                     const idsToDelete = oldestLogs.map(log => log.logging_id);
                     await Logging.destroy({
