@@ -5,6 +5,8 @@ const sequelize = require('../database/database');
 
 
 class LoggerController {
+    MAX_LOGS = 1000;
+    CLEANUP_INTERVAL = 3_600_000;
     constructor(){
         //init hooks loggers for models
         Object.values(Models).forEach(function(model){
@@ -16,7 +18,43 @@ class LoggerController {
             [this.addNewDestroy, "afterDestroy"],
             [this.addNewUpdate, "afterUpdate"]
         ]);
+
+        this.startCleanupScheduler();
     }
+
+    startCleanupScheduler() {
+        this.cleanupOldLogs();
+        setInterval(() => {
+            this.cleanupOldLogs();
+        }, this.CLEANUP_INTERVAL);
+    }
+
+    async cleanupOldLogs() {
+        try {
+            const count = await Logging.count();
+            
+            if (count > this.MAX_LOGS) {
+                const toDelete = count - this.MAX_LOGS;
+                
+                const oldestLogs = await Logging.findAll({
+                    order: [['created_at', 'ASC']],
+                    limit: toDelete,
+                    attributes: ['logging_id']
+                });
+
+                if (oldestLogs.length > 0) {
+                    const idsToDelete = oldestLogs.map(log => log.logging_id);
+                    await Logging.destroy({
+                        where: { logging_id: idsToDelete }
+                    });
+                    logger.info(`Scheduled cleanup: Removed ${idsToDelete.length} oldest logs (total: ${count}, max: ${this.MAX_LOGS})`);
+                }
+            }
+        } catch (e) {
+            logger.error(`Scheduled cleanup error: ${e.message}`);
+        }
+    }
+
     async addNewCreate(modelName, data, options){
         try {
             logger.info("Creating new log:" + modelName + "-" + "create")

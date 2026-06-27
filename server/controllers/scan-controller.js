@@ -10,7 +10,8 @@ const {OrderItemPart,
     Address,
     OrderItem,
     Order,
-    Customer} = require('../database/models')
+    Customer, 
+    LoggingScans} = require('../database/models')
 
 class ScanController
 {

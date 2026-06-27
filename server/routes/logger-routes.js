@@ -3,8 +3,6 @@ const router = new Router()
 
 const loggerController = require("../controllers/logger-controller")
 const checkRoleMiddleware = require('../middleware/check-role-middleware')
-const authMiddleware = require('../middleware/auth-middleware')
-
 
 router.delete('/clear', checkRoleMiddleware("manager"), loggerController.clear)
 router.delete('/remove/:id', checkRoleMiddleware("manager"), loggerController.remove)

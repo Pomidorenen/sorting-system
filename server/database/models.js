@@ -160,6 +160,7 @@ const LoggingScans = sequelize.define("logging_scans",{
         onDelete: 'RESTRICT',
         onUpdate: 'CASCADE'
     },
+    
     type_scan:{type: DataTypes.ENUM("CLEAR","RECOVERY"),allowNull:false }
 },{
     tableName: 'LoggingScans',
