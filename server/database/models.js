@@ -152,7 +152,14 @@ const LoggingScans = sequelize.define("logging_scans",{
     logging_scans_id: {type:DataTypes.INTEGER,primaryKey:true, autoIncrement: true},
     is_recovery:{type:DataTypes.BOOLEAN,defaultValue:false},
     // или counter_recovery :{type:DataTypes:DataTypes.INTEGER,defaultValue:0}
-    user_id:{type: DataTypes.INTEGER, allowNull:false},
+    user_id:{type: DataTypes.INTEGER, allowNull:false,
+        references: {
+            model: 'Employee', 
+            key: 'employee_id'
+        },
+        onDelete: 'RESTRICT',
+        onUpdate: 'CASCADE'
+    },
     type_scan:{type: DataTypes.ENUM("CLEAR","RECOVERY"),allowNull:false }
 },{
     tableName: 'LoggingScans',
@@ -174,7 +181,9 @@ const LoggingScans = sequelize.define("logging_scans",{
     }]
 });
 
-
+// определение ассоциаций Employee и LoggingScans
+LoggingScans.belongsTo(Employee, {foreignKey: 'user_id',targetKey: 'employee_id',});
+Employee.hasMany(LoggingScans, {foreignKey: 'user_id',sourceKey: 'employee_id',});
 
 Address.hasMany(Warehouse, { foreignKey: 'address_id', onDelete: 'RESTRICT' });
 Warehouse.belongsTo(Address, { foreignKey: 'address_id' });
