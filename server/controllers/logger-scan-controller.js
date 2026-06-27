@@ -19,28 +19,25 @@ class LoggerScansController {
             const userId = req.user.id;
 
             const {
-                ...err,
-                log: newLog
+                log: newLog, ...err
             } = await loggerScansService.createScanLog(userId, part_id, is_recovery);
-            
+
             if(err.error){
                 logger.error(err.message);
                 return next(ApiError.internal(err.message));
             }
 
             logger.done(`Log entry created with id: ${newLog.logging_scans_id}`);
-            const {
-                ...err,
-                log
-            } = await loggerScansService.getOneById(newLog.logging_scans_id);
 
-            if(err.error){
+            const log = await loggerScansService.getOneById(newLog.logging_scans_id) ;
+
+            if(log.error){
                 logger.warn("Log not found");
-                return next(ApiError.notFound(err.message));
+                return next(ApiError.notFound(log.message));
             }
 
             logger.done("Sending response");
-            return res.json(log);
+            return res.json(log.log);
         }
         catch(e)
         {
@@ -58,8 +55,8 @@ class LoggerScansController {
             }
 
             const {
-                ...err,
-                log
+                log,
+                ...err
             } = await loggerScansService.getOneById(id);
 
             if(err.error){
