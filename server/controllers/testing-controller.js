@@ -15,6 +15,7 @@ const {
     OrderItemPart
 } = require("../database/models")
 const sequelize = require("../database/database")
+const logger = require('../modules/logger')
 
 class TestingController
 {
@@ -67,6 +68,7 @@ class TestingController
             })
 
             const warehouseCount = faker.number.int({ min: getCount(3), max: getCount(5) });
+            logger.info(warehouseCount);
             const warehouseAddresses = []
 
             for (let i = 0; i < warehouseCount; i++)

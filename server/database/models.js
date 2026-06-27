@@ -1,7 +1,7 @@
 const sequelize = require('./database');
 const logger = require("../modules/logger");
 const { DataTypes } = require('sequelize');
-const { th } = require('@faker-js/faker');
+
 
 const Address = sequelize.define('address', {
     address_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -132,7 +132,7 @@ const OrderItemPart = sequelize.define('orderItemPart', {
     indexes: [{ name: 'idx_order_item_part', fields: ['order_item_id', 'part_id'] }]
 });
 
-// New table for sql-query storage
+// New table for sql-query storage (Хуйня не нужна, потом удалить)
 const Logging = sequelize.define("logging", {
     logging_id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     model_name: { type: DataTypes.STRING(100), allowNull: false },
@@ -146,6 +146,35 @@ const Logging = sequelize.define("logging", {
     createdAt: 'created_at',
     updatedAt: false,
 });
+
+// Таблица для логинов сканов кодов
+const LoggingScans = sequelize.define("logging_scans",{
+    logging_scans_id: {type:DataTypes.INTEGER,primaryKey:true, autoIncrement: true},
+    is_recovery:{type:DataTypes.BOOLEAN,defaultValue:false},
+    // или counter_recovery :{type:DataTypes:DataTypes.INTEGER,defaultValue:0}
+    user_id:{type: DataTypes.INTEGER, allowNull:false},
+    type_scan:{type: DataTypes.ENUM("CLEAR","RECOVERY"),allowNull:false }
+},{
+    tableName: 'LoggingScans',
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: false,
+    indexes: [
+    {
+        name: 'idx_user_type_scan',
+        fields: ['user_id', 'type_scan']
+    }, 
+    {
+        name: 'idx_user_id',
+         fields: ['user_id']
+    },
+    {
+        name: 'idx_user_type_recovery_created',
+        fields: ['user_id', 'type_scan', 'is_recovery', 'created_at']
+    }]
+});
+
+
 
 Address.hasMany(Warehouse, { foreignKey: 'address_id', onDelete: 'RESTRICT' });
 Warehouse.belongsTo(Address, { foreignKey: 'address_id' });
@@ -189,5 +218,6 @@ module.exports = {
     PartType,
     Part,
     OrderItemPart,
-    Logging
+    Logging,
+    LoggingScans
 };

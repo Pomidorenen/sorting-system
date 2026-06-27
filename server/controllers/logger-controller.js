@@ -143,6 +143,7 @@ class LoggerController {
                    "created_at" 
                 ]
             });
+            logger.done("Sending response")
             return res.json(logs);
         } 
         catch (e) 
@@ -161,8 +162,8 @@ class LoggerController {
                 return next(ApiError.badRequest("Incorrect request data"))
             }
 
-            logger.info("Removing log")
-            await Logger.destroy({where: {logging_id: id}})
+            logger.info("Removing log");
+            await Logger.destroy({where: {logging_id: id}});
 
             logger.done("Sending response")
             return res.json({message:"Log remove"});
