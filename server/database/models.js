@@ -147,7 +147,7 @@ const Logging = sequelize.define("logging", {
     updatedAt: false,
 });
 
-// Таблица для логинов сканов кодов
+// Таблица для логинов скан-кодов
 const LoggingScans = sequelize.define("logging_scans",{
     logging_scans_id: {type:DataTypes.INTEGER,primaryKey:true, autoIncrement: true},
     is_recovery:{type:DataTypes.BOOLEAN,defaultValue:false},
