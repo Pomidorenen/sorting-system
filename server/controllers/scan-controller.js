@@ -136,7 +136,7 @@ class ScanController
 
             // логирование
             const isRecovery = req.body.is_recovery || false;
-            const log = await LoggingService.createScanLog(
+            const log = await loggerScansService.createScanLog(
                 req.user.id,                 
                 part.dataValues.part_id,
                 isRecovery
@@ -144,7 +144,7 @@ class ScanController
             if(log.error){
                 logger.error(log.message);
             }
-            
+
             logger.info("Sending WebSocket response")
             await socket.broadcast(req.user.id, JSON.stringify({
                 status: 200,

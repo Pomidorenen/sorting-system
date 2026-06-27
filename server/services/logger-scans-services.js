@@ -4,9 +4,9 @@ const { error } = require('../modules/logger');
 class LoggerScansService {
     async createScanLog(userId, partId, isRecovery = false) {
         try {
-            const user = await Employee.findOne({where:{}});
+            const user = await Employee.findOne({where:{employee_id:userId}});
             const part = await Part.findOne({where:{part_id:partId}});
-
+            
             if(!user){
                 throw `Employee not found with id: ${userId}`;
             }
