@@ -1,51 +1,79 @@
 const logger = require("../modules/logger");
 const ApiError = require('../error/api-error');
-const { LoggingScans,Employee } = require('../database/models')
+const { LoggingScans, Employee, Part } = require('../database/models')
+const loggerScansService = require("../services/logger-scans-services");
 const sequelize = require('../database/database');
 
 
 class LoggerScansController {
-    async addNew(){
+    async addNew(req, res, next){
+        try{
+            logger.info("Call " + req.baseUrl + req.url);
+            const { is_recovery, part_id } = req.body;
 
+            if (!req.user) {
+                logger.warn("Unauthorized access attempt");
+                return next(ApiError.unauthorized('User not authenticated'));
+            }
+
+            const userId = req.user.id;
+
+            const {
+                ...err,
+                log: newLog
+            } = await loggerScansService.createScanLog(userId, part_id, is_recovery);
+            
+            if(err.error){
+                logger.error(err.message);
+                return next(ApiError.internal(err.message));
+            }
+
+            logger.done(`Log entry created with id: ${newLog.logging_scans_id}`);
+            const {
+                ...err,
+                log
+            } = await loggerScansService.getOneById(newLog.logging_scans_id);
+
+            if(err.error){
+                logger.warn("Log not found");
+                return next(ApiError.notFound(err.message));
+            }
+
+            logger.done("Sending response");
+            return res.json(log);
+        }
+        catch(e)
+        {
+            logger.error(e);
+            return next(ApiError.internal('Request error: ' + e.message));
+        }
     }    
     async getById(req, res, next){
         try {
             const {id} = req.params;
+
             if (isNaN(id))
             {
                 return next(ApiError.badRequest("Incorrect request data"));
             }
-            logger.info("Find log");
-            const log = await LoggingScans.findOne({where: {logging_scans_id: id}},{
-                attributes:[
-                   "logging_scans_id",
-                   "is_recovery",
-                   "user_id",
-                   "type_scan",
-                   "created_at" 
-                ],
-                include: [{
-                model: Employee, 
-                // Мб еще поля добавить по необходимости,к примеру  Rolе
-                attributes: ['first_name', 'last_name', 'middle_name',], 
-                as:"Employee"
-            }]
-            });
-            if (log)
-            {
-                logger.done("Sending response")
-                return res.json(log.dataValues)
+
+            const {
+                ...err,
+                log
+            } = await loggerScansService.getOneById(id);
+
+            if(err.error){
+                logger.warn("Log not found");
+                return next(ApiError.notFound(err.message));
             }
-            else
-            {
-                logger.warn("Log not found")
-                return next(ApiError.notFound('Log not found'))
-            }
+
+            logger.done("Sending response");
+            return res.json(log.dataValues);
         } 
         catch (e) 
         {
-            logger.error(e)
-            return next(ApiError.internal('Request error: ' + e.message))
+            logger.error(e);
+            return next(ApiError.internal('Request error: ' + e.message));
         }
     }
 
@@ -58,7 +86,6 @@ class LoggerScansController {
                 attributes:[
                    "logging_scans_id",
                    "is_recovery",
-                   "user_id",
                    "type_scan",
                    "created_at" 
                 ],
@@ -67,6 +94,10 @@ class LoggerScansController {
                 // Мб еще поля добавить по необходимости,к примеру  Rolе
                 attributes: ['first_name', 'last_name', 'middle_name',], 
                 as:"Employee"
+                },{
+                    model:  Part,
+                    attributes :["serial_number","batch_number","manufacture_date"],
+                    as: "Part"
                 }]
             });
             logger.done("Sending response")
@@ -89,7 +120,7 @@ class LoggerScansController {
             }
 
             logger.info("Removing log");
-            await Logger.destroy({where: {logging_id: id}});
+            await Logger.destroy({where: {logging_scans_id: id}});
 
             logger.done("Sending response")
             return res.json({message:"Log remove"});
@@ -117,5 +148,3 @@ class LoggerScansController {
 
 
 module.exports = new LoggerScansController();
-
-

@@ -2,6 +2,7 @@ const ApiError = require('../error/api-error')
 const {Buffer} = require('buffer')
 const sequelize = require('sequelize')
 const logger = require('../modules/logger')
+const loggerScansService = require("../services/logger-scans-services");
 const socket = require('./service-controller')
 const {OrderItemPart,
     Part,
@@ -10,8 +11,7 @@ const {OrderItemPart,
     Address,
     OrderItem,
     Order,
-    Customer, 
-    LoggingScans} = require('../database/models')
+    Customer,} = require('../database/models')
 
 class ScanController
 {
@@ -21,7 +21,6 @@ class ScanController
         try
         {
             logger.info("Call " + req.baseUrl + req.url)
-
 
             const {serial_number, batch_number} = req.body
             const {image} = req.files
@@ -135,6 +134,17 @@ class ScanController
             }
 
 
+            // логирование
+            const isRecovery = req.body.is_recovery || false;
+            const log = await LoggingService.createScanLog(
+                req.user.id,                 
+                part.dataValues.part_id,
+                isRecovery
+            );
+            if(log.error){
+                logger.error(log.message);
+            }
+            
             logger.info("Sending WebSocket response")
             await socket.broadcast(req.user.id, JSON.stringify({
                 status: 200,

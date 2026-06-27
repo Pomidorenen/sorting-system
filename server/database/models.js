@@ -139,7 +139,6 @@ const Logging = sequelize.define("logging", {
     action: {type:DataTypes.ENUM('CREATE', 'UPDATE', 'DELETE')},
     old_data: DataTypes.JSON,
     new_data: DataTypes.JSON,
-    // user_id:{ type: DataTypes.INTEGER },
 }, {
     tableName: 'Logging',
     timestamps: true,
@@ -152,6 +151,7 @@ const LoggingScans = sequelize.define("logging_scans",{
     logging_scans_id: {type:DataTypes.INTEGER,primaryKey:true, autoIncrement: true},
     is_recovery:{type:DataTypes.BOOLEAN,defaultValue:false},
     // или counter_recovery :{type:DataTypes:DataTypes.INTEGER,defaultValue:0}
+    type_scan:{type: DataTypes.ENUM("CLEAR","RECOVERY"),allowNull:false },
     user_id:{type: DataTypes.INTEGER, allowNull:false,
         references: {
             model: 'Employee', 
@@ -160,31 +160,42 @@ const LoggingScans = sequelize.define("logging_scans",{
         onDelete: 'RESTRICT',
         onUpdate: 'CASCADE'
     },
-    
-    type_scan:{type: DataTypes.ENUM("CLEAR","RECOVERY"),allowNull:false }
+    part_id:{
+        type: DataTypes.INTEGER, allowNull: false,
+        references:{
+            model: "Parts",
+            key: "part_id"
+        },
+        onDelete: 'RESTRICT',
+        onUpdate: 'CASCADE'
+    },
 },{
     tableName: 'LoggingScans',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: false,
     indexes: [
-    {
+     {
         name: 'idx_user_type_scan',
         fields: ['user_id', 'type_scan']
-    }, 
-    {
-        name: 'idx_user_id',
-         fields: ['user_id']
     },
     {
-        name: 'idx_user_type_recovery_created',
-        fields: ['user_id', 'type_scan', 'is_recovery', 'created_at']
+        name: 'idx_part_type_created',
+        fields: ['part_id', 'type_scan', 'created_at']
+    },
+    {
+        name: 'idx_part_id',
+        fields: ['part_id']
     }]
 });
 
 // определение ассоциаций Employee и LoggingScans
 LoggingScans.belongsTo(Employee, {foreignKey: 'user_id',targetKey: 'employee_id',});
 Employee.hasMany(LoggingScans, {foreignKey: 'user_id',sourceKey: 'employee_id',});
+
+// определение ассоциаций Part и LoggingScans
+LoggingScans.belongsTo(Part, { foreignKey: 'part_id', targetKey:'part_id' });
+Part.hasMany(LoggingScans, { foreignKey: 'part_id', sourceKey: 'part_id' });
 
 Address.hasMany(Warehouse, { foreignKey: 'address_id', onDelete: 'RESTRICT' });
 Warehouse.belongsTo(Address, { foreignKey: 'address_id' });
