@@ -1,6 +1,6 @@
 const logger = require("../modules/logger");
 const ApiError = require('../error/api-error');
-const { Logging, ...Models } = require('../database/models')
+const { Logging, LoggingScans, ...Models } = require('../database/models')
 const sequelize = require('../database/database');
 
 

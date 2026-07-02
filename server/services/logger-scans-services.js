@@ -1,5 +1,4 @@
 const { LoggingScans, Employee, Part } = require('../database/models');
-const { error } = require('../modules/logger');
 
 class LoggerScansService {
     async createScanLog(userId, partId, isRecovery = false) {

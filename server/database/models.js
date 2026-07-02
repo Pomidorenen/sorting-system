@@ -45,6 +45,40 @@ const Employee = sequelize.define('employee', {
     indexes: [{ name: 'idx_employee_login', fields: ['login'] }],
 });
 
+
+const Shift = sequelize.define('shift', {
+    shift_id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    employee_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+        model: 'Employee',
+        key: 'employee_id'
+        }
+    },
+    start_datetime: {
+        type: DataTypes.DATE,
+        allowNull: false
+    },
+    end_datetime: {
+        type: DataTypes.DATE,
+        allowNull: false,
+    },
+    }, {
+    tableName: 'Shift',
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: false,
+    indexes: [
+        { name: 'idx_shift_employee', fields: ['employee_id'] },
+        { name: 'idx_shift_datetime', fields: ['start_datetime', 'end_datetime'] }
+    ]
+});
+
 const Customer = sequelize.define('customer', {
     customer_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     company_name: { type: DataTypes.STRING(200), allowNull: false },
@@ -132,7 +166,7 @@ const OrderItemPart = sequelize.define('orderItemPart', {
     indexes: [{ name: 'idx_order_item_part', fields: ['order_item_id', 'part_id'] }]
 });
 
-// New table for sql-query storage (Хуйня не нужна, потом удалить)
+// New table for sql-query storage (Хуйня не нужная, потом удалить)
 const Logging = sequelize.define("logging", {
     logging_id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     model_name: { type: DataTypes.STRING(100), allowNull: false },
@@ -189,6 +223,8 @@ const LoggingScans = sequelize.define("logging_scans",{
     }]
 });
 
+
+
 // определение ассоциаций Employee и LoggingScans
 LoggingScans.belongsTo(Employee, {foreignKey: 'user_id',targetKey: 'employee_id',});
 Employee.hasMany(LoggingScans, {foreignKey: 'user_id',sourceKey: 'employee_id',});
@@ -196,6 +232,10 @@ Employee.hasMany(LoggingScans, {foreignKey: 'user_id',sourceKey: 'employee_id',}
 // определение ассоциаций Part и LoggingScans
 LoggingScans.belongsTo(Part, { foreignKey: 'part_id', targetKey:'part_id' });
 Part.hasMany(LoggingScans, { foreignKey: 'part_id', sourceKey: 'part_id' });
+
+// определение ассоциаций Employee и Shift
+Employee.hasMany(Shift, { foreignKey: 'employee_id'});
+Shift.belongsTo(Employee, { foreignKey: 'employee_id' });
 
 Address.hasMany(Warehouse, { foreignKey: 'address_id', onDelete: 'RESTRICT' });
 Warehouse.belongsTo(Address, { foreignKey: 'address_id' });
@@ -240,5 +280,6 @@ module.exports = {
     Part,
     OrderItemPart,
     Logging,
-    LoggingScans
+    LoggingScans,
+    Shift
 };
