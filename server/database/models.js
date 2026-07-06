@@ -166,19 +166,8 @@ const OrderItemPart = sequelize.define('orderItemPart', {
     indexes: [{ name: 'idx_order_item_part', fields: ['order_item_id', 'part_id'] }]
 });
 
-// New table for sql-query storage (Хуйня не нужная, потом удалить)
-const Logging = sequelize.define("logging", {
-    logging_id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    model_name: { type: DataTypes.STRING(100), allowNull: false },
-    action: {type:DataTypes.ENUM('CREATE', 'UPDATE', 'DELETE')},
-    old_data: DataTypes.JSON,
-    new_data: DataTypes.JSON,
-}, {
-    tableName: 'Logging',
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: false,
-});
+// New table for sql-query storage 
+
 
 // Таблица для логинов скан-кодов
 const LoggingScans = sequelize.define("logging_scans",{

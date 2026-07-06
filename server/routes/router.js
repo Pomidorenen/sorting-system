@@ -9,7 +9,7 @@ const partTypeRouter = require('./part-type-routes')
 const partRouter = require('./part-routes')
 const scanRouter = require('./scan-routes')
 const testingRouter = require('./testing-routes')
-const loggerRouter = require('./logger-routes')
+// const loggerRouter = require('./logger-routes')
 const loggerScansRouter = require('./logger-scans-routes')
 
 const router = new Router()
@@ -22,7 +22,7 @@ router.use("/part-type", partTypeRouter)
 router.use("/part", partRouter)
 router.use("/service", scanRouter)
 router.use("/test", testingRouter)
-router.use("/logger", loggerRouter)
+// router.use("/logger", loggerRouter)
 router.use("/logger-scans", loggerScansRouter)
 
 module.exports = router
