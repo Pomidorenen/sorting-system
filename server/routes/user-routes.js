@@ -2,14 +2,12 @@ const Router = require('express')
 const router = new Router()
 
 const userController = require("../controllers/user-controller")
-const authMiddleware = require('../middleware/auth-middleware')
-const checkRoleMiddleware = require('../middleware/check-role-middleware')
+const checkShiftRoleMiddleware = require('../middleware/check-shift-role-middleware')
+const checkShiftMiddleware = require('../middleware/check-shift-middleware')
 
 router.post('/registration', userController.registration)
-router.post('/login', userController.login)
-router.get('/auth', authMiddleware, userController.check)
-router.get('/me', authMiddleware, userController.aboutMe)
-router.get('/', checkRoleMiddleware("manager"), userController.getAll)
-router.get('/:id', checkRoleMiddleware("manager"), userController.getOne)
+router.get('/me', checkShiftMiddleware, userController.aboutMe)
+router.get('/', checkShiftRoleMiddleware("manager"), userController.getAll)
+router.get('/:id', checkShiftRoleMiddleware("manager"), userController.getOne)
 
 module.exports = router

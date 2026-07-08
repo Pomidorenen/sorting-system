@@ -1,8 +1,7 @@
 const ApiError = require('../error/api-error')
 const {Employee} = require('../database/models')
 const config = require('../modules/config')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const logger = require('../modules/logger')
 
 
 class UserController
@@ -11,34 +10,21 @@ class UserController
     {
         try
         {
-            const { first_name, last_name, middle_name, role, login, password } = req.body
-            if (!first_name || !last_name || !middle_name || !role || !login || !password)
+            const { first_name, last_name, middle_name, role, } = req.body
+            if (!first_name || !last_name || !middle_name || !role )
             {
                 return next(ApiError.badRequest("Incorrect request data"))
             }
 
-            let user = await Employee.findOne({where: {login: login}})
-            if(user)
-            {
-                return next(ApiError.conflict('This login is already in use'))
-            }
-
-            const hashPassword = await bcrypt.hash(password + config.encryption.salt, 10)
             user = await Employee.create({
                 first_name: first_name,
                 last_name: last_name,
                 middle_name: middle_name,
                 role: role,
-                login: login,
-                password_hash: hashPassword
-            })
+            });
 
-            const token = jwt.sign(
-                {id: user.dataValues.employee_id, role: user.dataValues.role},
-                config.encryption.JWT_pass_code,
-                {expiresIn: config.encryption.JWT_duration + 'h'}
-            )
-            return res.json({token})
+            logger.done("User is create");
+            return res.status(200).json({message:"User is create"});
         }
         catch (e)
         {
@@ -46,61 +32,6 @@ class UserController
         }
     }
 
-    async login(req, res, next)
-    {
-        try
-        {
-            const {login, password} = req.body
-            if (!login || !password)
-            {
-                return next(ApiError.badRequest("Incorrect request data"))
-            }
-
-            const user = await Employee.findOne({where: {login}})
-            if (!user)
-            {
-                return next(ApiError.badRequest('Incorrect authentication data'))
-            }
-            if (!user.dataValues.is_active)
-            {
-                return next(ApiError.forbidden('Employee has been deactivated'))
-            }
-
-            const isPassCorrect = await bcrypt.compare(password + config.encryption.salt, user.dataValues.password_hash)
-            if (!isPassCorrect)
-            {
-                return next(ApiError.badRequest('Incorrect authentication data'))
-            }
-
-            const token = jwt.sign(
-                {id: user.dataValues.employee_id, role: user.dataValues.role},
-                config.encryption.JWT_pass_code,
-                {expiresIn: config.encryption.JWT_duration + 'h'}
-            )
-            return res.json({token})
-        }
-        catch (e)
-        {
-            return next(ApiError.internal('Login error: ' + e.message))
-        }
-    }
-
-    async check(req, res, next)
-    {
-        try
-        {
-            const token = jwt.sign(
-                {id: req.user.id, role: req.user.role},
-                config.encryption.JWT_pass_code,
-                {expiresIn: config.encryption.JWT_duration + 'h'}
-            )
-            return res.json({token})
-        }
-        catch (e)
-        {
-            return next(ApiError.internal('Validate error: ' + e.message))
-        }
-    }
 
     async getAll(req, res, next)
     {
@@ -114,7 +45,6 @@ class UserController
                     "middle_name",
                     "role",
                     "is_active",
-                    "login",
                     "created_at",
                 ]})
             return res.json(users)
@@ -136,7 +66,6 @@ class UserController
                     "middle_name",
                     "role",
                     "is_active",
-                    "login",
                     "created_at"
                 ]})
             return res.json(user)
@@ -163,7 +92,6 @@ class UserController
                     "middle_name",
                     "role",
                     "is_active",
-                    "login",
                     "created_at"
                 ]})
 

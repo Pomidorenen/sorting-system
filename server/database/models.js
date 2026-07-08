@@ -35,14 +35,11 @@ const Employee = sequelize.define('employee', {
     middle_name: { type: DataTypes.STRING(50) },
     role: { type: DataTypes.ENUM('qc', 'manager'), defaultValue: 'qc' },
     is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
-    login: { type: DataTypes.STRING(100), allowNull: false, unique: true },
-    password_hash: { type: DataTypes.STRING(255), allowNull: false }
 }, {
     tableName: 'Employee',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: false,
-    indexes: [{ name: 'idx_employee_login', fields: ['login'] }],
 });
 
 
@@ -166,7 +163,6 @@ const OrderItemPart = sequelize.define('orderItemPart', {
     indexes: [{ name: 'idx_order_item_part', fields: ['order_item_id', 'part_id'] }]
 });
 
-// New table for sql-query storage 
 
 
 // Таблица для логинов скан-кодов
@@ -174,7 +170,7 @@ const LoggingScans = sequelize.define("logging_scans",{
     logging_scans_id: {type:DataTypes.INTEGER,primaryKey:true, autoIncrement: true},
     is_recovery:{type:DataTypes.BOOLEAN,defaultValue:false},
     // или counter_recovery :{type:DataTypes:DataTypes.INTEGER,defaultValue:0}
-    type_scan:{type: DataTypes.ENUM("CLEAR","RECOVERY"),allowNull:false },
+    type_scan:{type: DataTypes.ENUM("CLEAR","RECOVERY"),allowNull:false, defaultValue:"CLEAR" },
     user_id:{type: DataTypes.INTEGER, allowNull:false,
         references: {
             model: 'Employee', 
@@ -268,7 +264,6 @@ module.exports = {
     PartType,
     Part,
     OrderItemPart,
-    Logging,
     LoggingScans,
     Shift
 };

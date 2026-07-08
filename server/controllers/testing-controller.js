@@ -1,7 +1,6 @@
 const ApiError = require('../error/api-error')
 const utils = require('../modules/utils')
 const { faker } = require('@faker-js/faker')
-const bcrypt = require('bcrypt')
 const config = require('../modules/config')
 const {
     Address,
@@ -12,7 +11,8 @@ const {
     OrderItem,
     PartType,
     Part,
-    OrderItemPart
+    OrderItemPart,
+    Shift
 } = require("../database/models")
 const sequelize = require("../database/database")
 const logger = require('../modules/logger')
@@ -27,7 +27,7 @@ class TestingController
 
             let {override_DB, ratio} = req.body
 
-            ratio = parseFloat(ratio)
+            ratio = parseFloat(ratio);
 
             const getCount = (count) => {
                 return parseInt(count * ratio)
@@ -38,34 +38,43 @@ class TestingController
                 await sequelize.query("DROP SCHEMA IF EXISTS public CASCADE;\nCREATE SCHEMA public;")
                 await sequelize.sync()
             }
-
-            const adminPasswordHash = await bcrypt.hash('1234' + config.encryption.salt, 10)
-            const qcPasswordHash = await bcrypt.hash('1234' + config.encryption.salt, 10)
-
-            await Employee.findOrCreate({
-                where: {login: 'admin'},
-                defaults: {
-                    first_name: 'Администратор',
-                    last_name: 'Системы',
-                    middle_name: 'Главный',
-                    role: 'manager',
-                    is_active: true,
-                    login: 'admin',
-                    password_hash: adminPasswordHash
-                }
-            })
+            // qc role
             const [qcInspector] = await Employee.findOrCreate({
-                where: {login: 'qc'},
+                where:{role:"qc"},
                 defaults: {
                     first_name: 'Андрей',
                     last_name: 'Гайдулян',
                     middle_name: 'Сергеевич',
                     role: 'qc',
                     is_active: true,
-                    login: 'qc',
-                    password_hash: qcPasswordHash
                 }
             })
+            //  Короче, создаю 3 пользователей с 200 сменами по две минуты для проверки
+            const count = 3;
+            const employees = new Array(count).fill({});
+            for(var i = 0; i < count; i++){
+                var employee =  await Employee.create({
+                        first_name: 'Андрей'+ i,
+                        last_name: 'Гайдулян' + i,
+                        middle_name: 'Сергеевич' + i,
+                        role: 'manager',
+                        is_active: true,
+                });
+                employees[i] = employee;
+            }
+            const intervalTime = 1000 * 2 * 60;
+            const shiftCounters = 200;
+            var startDate = Date.now() - intervalTime;
+            for(var internal = 0; internal < shiftCounters; internal++){
+                var curIndex = internal % count;
+                var startDate = startDate + intervalTime;
+                var endDate = startDate + intervalTime;
+                await Shift.create({
+                    employee_id: employees[curIndex].employee_id,
+                    start_datetime: startDate,
+                    end_datetime: endDate
+                });
+            }
 
             const warehouseCount = faker.number.int({ min: getCount(3), max: getCount(5) });
             logger.info(warehouseCount);
@@ -229,7 +238,7 @@ class TestingController
         }
         catch (e)
         {
-            console.log(e)
+            logger.error(e)
             return next(ApiError.internal('Request error: ' + e.message))
         }
     }

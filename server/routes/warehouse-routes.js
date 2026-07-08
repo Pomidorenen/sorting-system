@@ -2,11 +2,12 @@ const Router = require('express')
 const router = new Router()
 
 const warehouseController = require("../controllers/warehouse-controller")
-const checkRoleMiddleware = require('../middleware/check-role-middleware')
-const authMiddleware = require('../middleware/auth-middleware')
-router.post('/new', checkRoleMiddleware("manager"), warehouseController.addNew)
-router.delete('/remove', checkRoleMiddleware("manager"), warehouseController.remove)
-router.get('/:id', authMiddleware, warehouseController.findOne)
-router.get('/', authMiddleware, warehouseController.findAll)
+const checkShiftRoleMiddleware = require('../middleware/check-shift-role-middleware')
+const checkShiftMiddleware = require('../middleware/check-shift-middleware')
+
+router.post('/new', checkShiftRoleMiddleware("manager"), warehouseController.addNew)
+router.delete('/remove', checkShiftRoleMiddleware("manager"), warehouseController.remove)
+router.get('/:id', checkShiftMiddleware, warehouseController.findOne)
+router.get('/', checkShiftMiddleware, warehouseController.findAll)
 
 module.exports = router

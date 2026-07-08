@@ -2,6 +2,7 @@ const logger = require("../modules/logger");
 const ApiError = require('../error/api-error');
 const { Shift, Employee } = require('../database/models')
 const sequelize = require('../database/database');
+const { Op } = require('sequelize');
 const {isExsistedByEmployer} = require("../services/shift-services");
 
 class ShiftController{
@@ -87,7 +88,7 @@ class ShiftController{
                 return next(ApiError.badRequest('Invalid shift identifier'));
             }
             const shift = await Shift.findOne({
-                where: { shift_id: shiftId },
+                where: { shift_id: id },
                 include: [{
                     model: Employee,
                     as: 'employee',
@@ -96,12 +97,12 @@ class ShiftController{
             });
 
             if (!shift) {
-                logger.info(`Shift with id ${shiftId} not found`);
+                logger.info(`Shift with id ${id} not found`);
                 return next(ApiError.notFound('Shift is not fouind'));
             }
             
             logger.info("Getting shift");
-            return res.json(shfits);
+            return res.json(shift);
 
         }catch(e){
              return next(ApiError.internal('Request error: ' + e.message));
@@ -115,14 +116,14 @@ class ShiftController{
                 return next(ApiError.badRequest('Invalid shift identifier'));
             }
             const {exists,data:shifts,error} = await isExsistedByEmployer(id);
-            if(!error){
+            if(error){
                 logger.error(error);
-                return next(ApiError.notFound('Shift is not fouind'));
+                return next(ApiError.notFound('Shift is not found'));
             }
 
             if (!exists) {
-                logger.info(`Shift with id ${shiftId} not found`);
-                return next(ApiError.notFound('Shift is not fouind'));
+                logger.info(`Shift with id ${id} not found`);
+                return next(ApiError.notFound('Shift is not found'));
             }
 
             logger.info("Getting shift");
@@ -140,7 +141,7 @@ class ShiftController{
             }
             const shift = await Shift.findByPk(id);
             if (!shift) {
-                logger.info(`Shift with id ${shiftId} not found`);
+                logger.info(`Shift with id ${id} not found`);
                 return next(ApiError.notFound('Shift not found'));
             }
             await shift.destroy();
@@ -174,14 +175,14 @@ class ShiftController{
             if(startDate>=endDate){
                  return next(ApiError.badRequest('The start time must be before the end time'));
             }
-            const shift = await Shift.findByPk(shiftId);
+            const shift = await Shift.findByPk(id);
             if (!shift) {
-                logger.info(`Shift with id ${shiftId} not found for update`);
+                logger.info(`Shift with id ${id} not found for update`);
                 return next(ApiError.notFound('Shift not found'));
             }
             const overlappingShift = await Shift.findOne({
                 where: {
-                    shift_id: { [Op.ne]: shiftId }, 
+                    shift_id: { [Op.ne]: id }, 
                     [Op.or]: [
                         {
                             start_datetime: { [Op.lt]: endDate },
@@ -196,8 +197,8 @@ class ShiftController{
                 return next(ApiError.conflict("The new date overlaps with another employee's shift"));
             }
             await shift.update({
-                start_datetime: start,
-                end_datetime: end
+                start_datetime: startDate,
+                end_datetime: endDate
             });
           
             logger.done("Sending response")
