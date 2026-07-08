@@ -10,13 +10,13 @@ class UserController
     {
         try
         {
-            const { first_name, last_name, middle_name, role, } = req.body
+            const { first_name, last_name, middle_name, role } = req.body
             if (!first_name || !last_name || !middle_name || !role )
             {
                 return next(ApiError.badRequest("Incorrect request data"))
             }
 
-            user = await Employee.create({
+            const user = await Employee.create({
                 first_name: first_name,
                 last_name: last_name,
                 middle_name: middle_name,
