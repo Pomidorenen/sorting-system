@@ -8,8 +8,8 @@ const {isExsistedByEmployer} = require("../services/shift-services");
 class ShiftController{
     async addNew(req, res, next){
         try{
-            const {id, start_datetime, end_datetime} = req.body;
-            const employee = await Employee.findOne({where:{employee_id:id}});
+            const {employee_id, start_datetime, end_datetime} = req.body;
+            const employee = await Employee.findOne({where:{employee_id:employee_id}});
             if(!employee){
                 logger.error("User not found");
                 return next(ApiError.notFound('Part not found'));
@@ -27,7 +27,7 @@ class ShiftController{
 
             const overlappingShift = await Shift.findOne({
                 where: {
-                    employee_id: id,
+                    employee_id: employee_id,
                     [Op.or]: [
                         {
                             start_datetime: { [Op.lte]: startDate },
@@ -46,12 +46,12 @@ class ShiftController{
             });
 
             if (overlappingShift) {
-                logger.warn(`Shift overlap for employee ${id} at ${startDate}`);
+                logger.warn(`Shift overlap for employee ${employee_id} at ${startDate}`);
                 return next(ApiError.conflict('The new shift overlaps with the existing one'));
             }
 
             const newShift = await Shift.create({
-                employee_id: id,
+                employee_id: employee_id,
                 start_datetime: startDate,
                 end_datetime: endDate
             });

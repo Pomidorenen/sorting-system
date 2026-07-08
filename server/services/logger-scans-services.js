@@ -42,16 +42,18 @@ class LoggerScansService {
                     "logging_scans_id",
                     "is_recovery",
                     "type_scan",
-                    "created_at"
+                    "created_at",
+                    "part_id",
+                    "user_id"
                 ],
                 include: [{
                     model: Employee,
-                    attributes: ['first_name', 'last_name', 'middle_name', 'role'],
-                    as: "Employee"
+                    attributes: ['first_name', 'last_name', 'middle_name'],
+                    as: "employee"
                 },{
                     model:  Part,
                     attributes :["serial_number","batch_number","manufacture_date"],
-                    as: "Part"
+                    as: "part"
                 }]
             });
             if(!log){

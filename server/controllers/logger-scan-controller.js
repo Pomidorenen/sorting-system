@@ -29,15 +29,8 @@ class LoggerScansController {
 
             logger.done(`Log entry created with id: ${newLog.logging_scans_id}`);
 
-            const log = await loggerScansService.getOneById(newLog.logging_scans_id) ;
-
-            if(log.error){
-                logger.warn("Log not found");
-                return next(ApiError.notFound(log.message));
-            }
-
             logger.done("Sending response");
-            return res.json(log.log);
+            return res.json(newLog);
         }
         catch(e)
         {
@@ -84,17 +77,18 @@ class LoggerScansController {
                    "logging_scans_id",
                    "is_recovery",
                    "type_scan",
-                   "created_at" 
+                   "created_at",
+                    "part_id",
+                    "user_id" 
                 ],
                 include: [{
                 model: Employee, 
-                // Мб еще поля добавить по необходимости,к примеру  Rolе
                 attributes: ['first_name', 'last_name', 'middle_name',], 
-                as:"Employee"
+                as:"employee"
                 },{
                     model:  Part,
                     attributes :["serial_number","batch_number","manufacture_date"],
-                    as: "Part"
+                    as: "part"
                 }]
             });
             logger.done("Sending response")

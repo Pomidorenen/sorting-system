@@ -3,7 +3,7 @@ const router = new Router()
 
 const scanController = require("../controllers/scan-controller")
 const loggerScansController = require("../controllers/logger-scan-controller")
-const checkShiftMiddleware = require('../middleware/auth-middleware')
+const checkShiftMiddleware = require('../middleware/check-shift-middleware')
 
 router.post("/scan", checkShiftMiddleware, scanController.scanCode.bind(scanController))
 
