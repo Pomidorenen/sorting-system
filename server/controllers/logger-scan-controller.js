@@ -10,7 +10,10 @@ class LoggerScansController {
         try{
             logger.info("Call " + req.baseUrl + req.url);
             const { is_recovery, part_id } = req.body;
-
+            if(!is_recovery || !part_id){
+                logger.warn("Data is requred");
+                return next(ApiError.conflict("Data is requred"));
+            }
             if (!req.user) {
                 logger.warn("Unauthorized access attempt");
                 return next(ApiError.unauthorized('User not authenticated'));
@@ -111,7 +114,7 @@ class LoggerScansController {
             }
 
             logger.info("Removing log");
-            await Logger.destroy({where: {logging_scans_id: id}});
+            await LoggingScans.destroy({where: {logging_scans_id: id}});
 
             logger.done("Sending response")
             return res.json({message:"Log remove"});

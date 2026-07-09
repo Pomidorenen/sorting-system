@@ -7,7 +7,7 @@ const checkShiftMiddleware = require('../middleware/check-shift-middleware')
 
 router.post("/new",checkShiftMiddleware, loggerScansController.addNew)
 router.delete('/clear', checkShiftRoleMiddleware("manager"), loggerScansController.clear)
-router.delete('/remove/:id', checkShiftRoleMiddleware("manager"), loggerScansController.remove)
+router.delete('/remove/', checkShiftRoleMiddleware("manager"), loggerScansController.remove)
 router.get('/:id', checkShiftMiddleware, loggerScansController.getById)
 router.get('/', checkShiftMiddleware, loggerScansController.getAll)
 
