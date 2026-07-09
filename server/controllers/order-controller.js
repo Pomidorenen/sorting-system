@@ -223,7 +223,7 @@ class OrderController
         {
             logger.info("Call " + req.baseUrl + req.url)
 
-            const {id} = req.params
+            const {id} = req.body;
 
             const order = await Order.findByPk(id)
             if (!order)
@@ -249,7 +249,7 @@ class OrderController
         {
             logger.info("Call " + req.baseUrl + req.url)
 
-            const {id} = req.params
+            const {id} = req.body;
 
             const item = await OrderItem.findByPk(id)
             if (!item)

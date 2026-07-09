@@ -6,7 +6,7 @@ const checkShiftRoleMiddleware = require('../middleware/check-shift-role-middlew
 const checkShiftMiddleware = require('../middleware/check-shift-middleware')
 
 router.post('/new', checkShiftRoleMiddleware("manager"), partController.addNew)
-router.delete('/remove', checkShiftRoleMiddleware("manager"), partController.remove)
+router.delete('/remove1', checkShiftRoleMiddleware("manager"), partController.remove)
 router.put('/:part_id/change-order', checkShiftMiddleware, partController.changeOrder)
 router.put('/:part_id/sort', checkShiftMiddleware, partController.sortPart)
 router.get('/:part_id/orders', checkShiftMiddleware, partController.findOrders)
