@@ -1,7 +1,7 @@
-const { LoggingScans, Employee, Part } = require('../database/models');
+const { LoggingScans, Employee, Part, Camera } = require('../database/models');
 
 class LoggerScansService {
-    async createScanLog(userId, partId, isRecovery = false) {
+    async createScanLog(userId, partId, isRecovery = false, camera_id = 1) {
         try {
             const user = await Employee.findOne({where:{employee_id:userId}});
             const part = await Part.findOne({where:{part_id:partId}});
@@ -18,7 +18,8 @@ class LoggerScansService {
                 is_recovery: isRecovery,
                 user_id: userId,
                 part_id: partId,
-                type_scan: typeScan
+                type_scan: typeScan,
+                camera_id:camera_id
             });
             return {
                 error: false,
@@ -54,6 +55,10 @@ class LoggerScansService {
                     model:  Part,
                     attributes :["serial_number","batch_number","manufacture_date"],
                     as: "part"
+                },{
+                    model:  Camera,
+                    attributes :["name","resolution_height","resolution_width","frame_rate","is_active"],
+                    as: "camera"
                 }]
             });
             if(!log){

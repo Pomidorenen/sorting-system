@@ -1,6 +1,6 @@
 const logger = require("../modules/logger");
 const ApiError = require('../error/api-error');
-const { LoggingScans, Employee, Part } = require('../database/models')
+const { LoggingScans, Employee, Part, Camera } = require('../database/models')
 const loggerScansService = require("../services/logger-scans-services");
 const sequelize = require('../database/database');
 
@@ -9,8 +9,8 @@ class LoggerScansController {
     async addNew(req, res, next){
         try{
             logger.info("Call " + req.baseUrl + req.url);
-            const { is_recovery, part_id } = req.body;
-            if(!is_recovery || !part_id){
+            const { is_recovery, part_id,camera_id } = req.body;
+            if(!is_recovery || !part_id || !camera_id){
                 logger.warn("Data is requred");
                 return next(ApiError.conflict("Data is requred"));
             }
@@ -23,7 +23,7 @@ class LoggerScansController {
 
             const {
                 log: newLog, ...err
-            } = await loggerScansService.createScanLog(userId, part_id, is_recovery);
+            } = await loggerScansService.createScanLog(userId, part_id, is_recovery,camera_id);
 
             if(err.error){
                 logger.error(err.message);
@@ -82,7 +82,8 @@ class LoggerScansController {
                    "type_scan",
                    "created_at",
                     "part_id",
-                    "user_id" 
+                    "user_id",
+                    "camera_id" 
                 ],
                 include: [{
                 model: Employee, 
@@ -92,6 +93,10 @@ class LoggerScansController {
                     model:  Part,
                     attributes :["serial_number","batch_number","manufacture_date"],
                     as: "part"
+                },{
+                    model:  Camera,
+                    attributes :["name","resolution_height","resolution_width","frame_rate","is_active"],
+                    as: "camera"
                 }]
             });
             logger.done("Sending response")

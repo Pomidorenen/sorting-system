@@ -22,13 +22,13 @@ class ScanController
         {
             logger.info("Call " + req.baseUrl + req.url)
 
-            const {serial_number, batch_number} = req.body
+            const {serial_number, batch_number, camera_id} = req.body
             const {image} = req.files
             let isSorted = false
             let inOrderId = null
             let orderItemId = null
 
-            if (!serial_number || !batch_number || !image)
+            if (!serial_number || !batch_number || !image || !camera_id)
             {
                 logger.warn("Invalid scan information: " + JSON.stringify(req.body))
                 await socket.broadcast(req.user.id, JSON.stringify({status: 400, message: 'Incorrect request data'}))
@@ -139,7 +139,8 @@ class ScanController
             const log = await loggerScansService.createScanLog(
                 req.user.id,                 
                 part.dataValues.part_id,
-                isRecovery
+                isRecovery,
+                camera_id
             );
             if(log.error){
                 logger.error(log.message);

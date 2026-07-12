@@ -12,7 +12,8 @@ const {
     PartType,
     Part,
     OrderItemPart,
-    Shift
+    Shift,
+    Camera
 } = require("../database/models")
 const sequelize = require("../database/database")
 const logger = require('../modules/logger')
@@ -76,6 +77,21 @@ class TestingController
                 });
             }
 
+           // Создаeм 2 камеры
+            await Camera.create({
+                name:"gRPC camera",
+                resolution_height:1280,
+                resolution_width:720,
+                frame_rate:30,
+                is_active:true
+            });
+            await Camera.create({
+                name:"RTSP camera",
+                resolution_height:1280,
+                resolution_width:720,
+                frame_rate:30,
+                is_active:true
+            });
             const warehouseCount = faker.number.int({ min: getCount(3), max: getCount(5) });
             logger.info(warehouseCount);
             const warehouseAddresses = []

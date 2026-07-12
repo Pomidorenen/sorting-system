@@ -163,8 +163,20 @@ const OrderItemPart = sequelize.define('orderItemPart', {
     indexes: [{ name: 'idx_order_item_part', fields: ['order_item_id', 'part_id'] }]
 });
 
-
-
+//Добавлена таблица камер
+const Camera = sequelize.define("camera",{
+    camera_id:{type:DataTypes.INTEGER,primaryKey:true, autoIncrement: true},
+    name:{type:DataTypes.STRING(100),defaultValue:"unnamed camera"},
+    resolution_height:{type:DataTypes.INTEGER,defaultValue:480},
+    resolution_width:{type:DataTypes.INTEGER,defaultValue:640},
+    frame_rate:{type:DataTypes.INTEGER,defaultValue:30},
+    is_active:{type:DataTypes.BOOLEAN,defaultValue:true}
+},{
+    tableName: 'Cameras',
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: false,
+});
 // Таблица для логинов скан-кодов
 const LoggingScans = sequelize.define("logging_scans",{
     logging_scans_id: {type:DataTypes.INTEGER,primaryKey:true, autoIncrement: true},
@@ -179,6 +191,15 @@ const LoggingScans = sequelize.define("logging_scans",{
         onDelete: 'RESTRICT',
         onUpdate: 'CASCADE'
     },
+    camera_id:{
+        type: DataTypes.INTEGER, allowNull: false,
+        references:{
+            model: "Cameras",
+            key: "camera_id"
+        },
+        onDelete: 'RESTRICT',
+        onUpdate: 'CASCADE'
+    },
     part_id:{
         type: DataTypes.INTEGER, allowNull: false,
         references:{
@@ -187,7 +208,7 @@ const LoggingScans = sequelize.define("logging_scans",{
         },
         onDelete: 'RESTRICT',
         onUpdate: 'CASCADE'
-    },
+    }
 },{
     tableName: 'Logging_Scans',
     timestamps: true,
@@ -217,6 +238,10 @@ Employee.hasMany(LoggingScans, {foreignKey: 'user_id',sourceKey: 'employee_id',}
 // определение ассоциаций Part и LoggingScans
 LoggingScans.belongsTo(Part, { foreignKey: 'part_id', targetKey:'part_id' });
 Part.hasMany(LoggingScans, { foreignKey: 'part_id', sourceKey: 'part_id' });
+
+// определение ассоциаций Camera и LoggingScans
+LoggingScans.belongsTo(Camera, { foreignKey: 'camera_id', targetKey:'camera_id' });
+Camera.hasMany(LoggingScans, { foreignKey: 'camera_id', sourceKey: 'camera_id' });
 
 // определение ассоциаций Employee и Shift
 Employee.hasMany(Shift, { foreignKey: 'employee_id'});
@@ -265,5 +290,6 @@ module.exports = {
     Part,
     OrderItemPart,
     LoggingScans,
-    Shift
+    Shift,
+    Camera
 };

@@ -11,6 +11,7 @@ const scanRouter = require('./scan-routes')
 const testingRouter = require('./testing-routes')
 const loggerScansRouter = require('./logger-scans-routes')
 const shiftRouter = require('./shift-routes');
+const cameraRouter = require("./camera-routes");
 
 const router = new Router()
 router.use("/user", userRouter)
@@ -24,5 +25,5 @@ router.use("/service", scanRouter)
 router.use("/test", testingRouter)
 router.use("/logger-scans", loggerScansRouter)
 router.use("/shift", shiftRouter)
-
+router.use("/camera", cameraRouter)
 module.exports = router
