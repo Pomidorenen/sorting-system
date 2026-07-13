@@ -22,25 +22,26 @@ class ScanController
         {
             logger.info("Call " + req.baseUrl + req.url)
 
-            const {serial_number, batch_number, camera_id} = req.body
-            const {image} = req.files
+            const {serial_number, camera_id} = req.body
+            const image = req.files?.image; 
             let isSorted = false
             let inOrderId = null
             let orderItemId = null
 
-            if (!serial_number || !batch_number || !image || !camera_id)
+            if (!serial_number || !image )
             {
                 logger.warn("Invalid scan information: " + JSON.stringify(req.body))
                 await socket.broadcast(req.user.id, JSON.stringify({status: 400, message: 'Incorrect request data'}))
                 return next(ApiError.badRequest("Incorrect request data"))
             }
             
-            const part = await Part.findOne({where: {serial_number, batch_number}, include: [
+            const part = await Part.findOne({where: {serial_number}, include: [
                 {model: PartType, as: "partType"},
                 {model: Warehouse, as: "warehouse", include: [{
                     model: Address, as: "address"
                 }]},
             ]})
+
             if(!part)
             {
                 logger.warn("Part not found")
@@ -134,18 +135,7 @@ class ScanController
             }
 
 
-            // логирование
-            const isRecovery = req.body.is_recovery || false;
-            const log = await loggerScansService.createScanLog(
-                req.user.id,                 
-                part.dataValues.part_id,
-                isRecovery,
-                camera_id
-            );
-            if(log.error){
-                logger.error(log.message);
-            }
-
+           
             logger.info("Sending WebSocket response")
             await socket.broadcast(req.user.id, JSON.stringify({
                 status: 200,
@@ -160,6 +150,20 @@ class ScanController
                     size: image.size
                 }
             }))
+
+
+             // логирование
+            const isRecovery = req.body.is_recovery || false;
+            const log = await loggerScansService.createScanLog(
+                req.user.id,                 
+                part.dataValues.part_id,
+                isRecovery,
+                camera_id// camera id пока один 
+            );
+            if(log.error){
+                logger.error(log.message);
+            }
+
 
             logger.done("Sending response")
             return res.json({message: "Ok"})

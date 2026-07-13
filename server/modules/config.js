@@ -8,6 +8,9 @@ class Config
     constructor()
     {
         this.def = {
+            scanner:{
+                url:"ws://192.168.1.10:8080"
+            },
             database: {
                 host: "localhost",
                 port: 5432,

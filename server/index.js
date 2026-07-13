@@ -18,6 +18,12 @@ const errorHandler = require('./middleware/error-handling-middleware')
 // Server settings
 const PORT = config.app.port || 5000
 
+const CreateScannerClient = require('./services/scaner-client');
+
+logger.info("Start ws scanner");
+const WS_PORT = 8080;
+CreateScannerClient(WS_PORT);
+
 logger.info("Creating app")
 const app = express()
 app.use(cors())
@@ -33,7 +39,6 @@ server.on("upgrade", socket.authenticate.bind(socket))
 const start = async () => {
     try
     {
-        // Init database
         logger.info("Connecting database")
         await database.authenticate()
         logger.info("Sync database")
@@ -42,6 +47,7 @@ const start = async () => {
             logger.done(`REST API server started on port ${PORT}`)
             logger.done(`WebSocket server started on port ${PORT}`)
         })
+
     }
     catch (e)
     {

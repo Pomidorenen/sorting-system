@@ -1,0 +1,21 @@
+{
+    "database": {
+        "host": "localhost",
+        "port": 5432,
+        "name": "sort",
+        "user": "postgres",
+        "password": "postgres"
+    },
+    "app": {
+        "port": 5000,
+        "dev_mode": false
+    },
+    "encryption": {
+        "salt": "nxzBmcm9vL",
+        "JWT_pass_code": "jZFJA8TtQtcedPGo04tTBqApFUrlV6MA",
+        "JWT_duration": 24
+    },
+    "scanner":{
+        "url":"ws://localhost:8080"
+    }
+}
