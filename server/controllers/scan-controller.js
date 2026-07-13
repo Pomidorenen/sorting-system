@@ -28,7 +28,7 @@ class ScanController
             let inOrderId = null
             let orderItemId = null
 
-            if (!serial_number || !image )
+            if (!serial_number || !image || !camera_id)
             {
                 logger.warn("Invalid scan information: " + JSON.stringify(req.body))
                 await socket.broadcast(req.user.id, JSON.stringify({status: 400, message: 'Incorrect request data'}))
