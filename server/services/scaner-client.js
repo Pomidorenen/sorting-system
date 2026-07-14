@@ -4,8 +4,8 @@ const {Employee} = require("../database/models");
 const logger = require('../modules/logger');
 const {isExsistedByDate} = require("./shift-services");
 
-const CreateScannerClient = (port = 8080) =>{
-    const wss = new WebSocketServer({port});
+const CreateScannerClient = (server) =>{
+    const wss = new WebSocketServer({server});
     wss.on("connection", function connection(ws){
         ws.on("message",async function message(data){
             try {
