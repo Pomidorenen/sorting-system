@@ -15,6 +15,7 @@ const router = require('./routes/router')
 const socket = require('./controllers/service-controller')
 const errorHandler = require('./middleware/error-handling-middleware')
 const CreateScannerClient = require('./services/scaner-client');
+const CreateCameraClient = require('./services/camera-client');
 // Server settings
 const PORT = config.app.port || 5000
 
@@ -33,6 +34,7 @@ app.use(errorHandler)
 logger.info("Creating server")
 const server = http.createServer(app)
 CreateScannerClient(server);
+CreateCameraClient();
 // server.on("upgrade", socket.authenticate.bind(socket))  // Пока в коментах, потому что не понятно нужно ли это авторизация
 
 const start = async () => {

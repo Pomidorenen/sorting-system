@@ -4,11 +4,15 @@
         "port": 5432,
         "name": "sort",
         "user": "postgres",
-        "password": "postgres"
+        "password": "0451"
     },
     "app": {
         "port": 5000,
         "dev_mode": true
+    },
+    "websocket": {
+        "url": "ws://localhost:3001/",
+        "reconnect_interval": 5000
     },
     "encryption": {
         "salt": "TZ3IxOyDuB",
